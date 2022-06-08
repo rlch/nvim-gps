@@ -18,35 +18,35 @@ Here is a example of how it can look in a fully configured statusline
 
 ## ✅ Supported Languages
 
-* Bash (and Zsh)
-* C
-* C++
-* C#
-* Fennel
-* Go
-* Html
-* Java
-* Javascript (and jsx)
-* JSON
-* LaTeX
-* Lua
-* Norg
-* Ocaml
-* Php
-* Python
-* Ruby
-* Rust
-* TOML
-* Typescript (and tsx)
-* Verilog
-* YAML
-* YANG
-* Zig
+-   Bash (and Zsh)
+-   C
+-   C++
+-   C#
+-   Fennel
+-   Go
+-   Html
+-   Java
+-   Javascript (and jsx)
+-   JSON
+-   LaTeX
+-   Lua
+-   Norg
+-   Ocaml
+-   Php
+-   Python
+-   Ruby
+-   Rust
+-   TOML
+-   Typescript (and tsx)
+-   Verilog
+-   YAML
+-   YANG
+-   Zig
 
 ## ⚡️ Requirements
 
-* Neovim >= 0.5.0
-* [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter)
+-   Neovim >= 0.5.0
+-   [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter)
 
 ## 📦 Installation
 
@@ -198,6 +198,9 @@ require("nvim-gps").setup({
 
 	-- indicator used when context hits depth limit
 	depth_limit_indicator = ".."
+
+  -- highlight group to use for text
+  text_hl = "Normal"
 })
 ```
 
@@ -214,7 +217,6 @@ gps.get_location()  -- Returns a string with context information (or nil if not 
 
 -- example output: "mystruct > sum"
 ```
-
 
 <details>
 <summary> You can also pass optional arguments to <code>get_location</code> function to override options given in setup function: </summary>
@@ -258,8 +260,6 @@ gps.get_data()      -- Returns a table of intermediate representation of data (w
 ```
 
 </details>
-
-
 
 ## Examples of Integrating with Other Plugins
 

@@ -10,15 +10,16 @@ local default_config = {
 	enabled = true,
 	disable_icons = false,
 	icons = {
-		["class-name"] = ' ',
-		["function-name"] = ' ',
-		["method-name"] = ' ',
-		["container-name"] = 'ﮅ ',
-		["tag-name"] = '炙',
+		["class-name"] = " ",
+		["function-name"] = " ",
+		["method-name"] = " ",
+		["container-name"] = "ﮅ ",
+		["tag-name"] = "炙",
 	},
-	separator = ' > ',
+	separator = " > ",
 	depth = 0,
-	depth_limit_indicator = ".."
+	depth_limit_indicator = "..",
+	text_hl = "Normal",
 }
 
 -- Languages specific default configuration must be added to configs
@@ -45,13 +46,13 @@ local function setup_language_configs()
 	configs = {
 		["json"] = with_default_config({
 			icons = {
-				["array-name"] = ' ',
-				["object-name"] = ' ',
-				["null-name"] = '[] ',
-				["boolean-name"] = 'ﰰﰴ ',
-				["number-name"] = '# ',
-				["string-name"] = ' '
-			}
+				["array-name"] = " ",
+				["object-name"] = " ",
+				["null-name"] = "[] ",
+				["boolean-name"] = "ﰰﰴ ",
+				["number-name"] = "# ",
+				["string-name"] = " ",
+			},
 		}),
 		["latex"] = with_default_config({
 			icons = {
@@ -66,33 +67,33 @@ local function setup_language_configs()
 		}),
 		["toml"] = with_default_config({
 			icons = {
-				["table-name"] = ' ',
-				["array-name"] = ' ',
-				["boolean-name"] = 'ﰰﰴ ',
-				["date-name"] = ' ',
-				["date-time-name"] = ' ',
-				["float-name"] = ' ',
-				["inline-table-name"] = ' ',
-				["integer-name"] = '# ',
-				["string-name"] = ' ',
-				["time-name"] = ' '
-			}
+				["table-name"] = " ",
+				["array-name"] = " ",
+				["boolean-name"] = "ﰰﰴ ",
+				["date-name"] = " ",
+				["date-time-name"] = " ",
+				["float-name"] = " ",
+				["inline-table-name"] = " ",
+				["integer-name"] = "# ",
+				["string-name"] = " ",
+				["time-name"] = " ",
+			},
 		}),
 		["verilog"] = with_default_config({
 			icons = {
-				["module-name"] = ' '
-			}
+				["module-name"] = " ",
+			},
 		}),
 		["yaml"] = with_default_config({
 			icons = {
-				["mapping-name"] = ' ',
-				["sequence-name"] = ' ',
-				["null-name"] = '[] ',
-				["boolean-name"] = 'ﰰﰴ ',
-				["integer-name"] = '# ',
-				["float-name"] = ' ',
-				["string-name"] = ' '
-			}
+				["mapping-name"] = " ",
+				["sequence-name"] = " ",
+				["null-name"] = "[] ",
+				["boolean-name"] = "ﰰﰴ ",
+				["integer-name"] = "# ",
+				["float-name"] = " ",
+				["string-name"] = " ",
+			},
 		}),
 		["yang"] = with_default_config({
 			icons = {
@@ -106,7 +107,7 @@ local function setup_language_configs()
 				["leaf-list-name"] = " ",
 				["leaf-name"] = " ",
 				["action-name"] = " ",
-			}
+			},
 		}),
 		["scss"] = with_default_config({
 			icons = {
@@ -114,27 +115,30 @@ local function setup_language_configs()
 				["scss-mixin-name"] = "@mixin ",
 				["scss-include-name"] = "@include ",
 				["scss-keyframes-name"] = "@keyframes ",
-			}
+			},
 		}),
 		["tsx"] = with_default_config({
 			icons = {
 				["hook-name"] = "ﯠ ",
-			}
+			},
 		}),
 	}
 end
 
-local data_cache_value = nil  -- table
-local location_cache_value = ""  -- string
-local data_prev_loc = {0, 0}
-local location_prev_loc = {0, 0}
+local data_cache_value = nil -- table
+local location_cache_value = "" -- string
+local data_prev_loc = { 0, 0 }
+local location_prev_loc = { 0, 0 }
 local setup_complete = false
 
 local function default_transform(config, capture_name, capture_text)
+	local hl = function(txt)
+		return "%#" .. config.text_hl .. "#" .. txt .. "%*"
+	end
 	return {
-		text = capture_text,
-		type = capture_name,
-		icon = config.icons[capture_name]
+		text = hl(capture_text),
+		type = hl(capture_name),
+		icon = config.icons[capture_name],
 	}
 end
 
@@ -143,20 +147,26 @@ local transform_lang = {
 		if capture_name == "multi-class-method" then
 			local temp = vim.split(capture_text, "%:%:")
 			local ret = {}
-			for i = 1, #temp-1  do
+			for i = 1, #temp - 1 do
 				local text = string.match(temp[i], "%s*([%w_]*)%s*<?.*>?%s*")
 				table.insert(ret, default_transform(config, "class-name", text))
 			end
-			table.insert(ret, default_transform(config, "method-name", string.match(temp[#temp], "%s*(~?%s*[%w_]*)%s*")))
+			table.insert(
+				ret,
+				default_transform(config, "method-name", string.match(temp[#temp], "%s*(~?%s*[%w_]*)%s*"))
+			)
 			return ret
 		elseif capture_name == "multi-class-class" then
 			local temp = vim.split(capture_text, "%:%:")
 			local ret = {}
-			for i = 1, #temp-1  do
+			for i = 1, #temp - 1 do
 				local text = string.match(temp[i], "%s*([%w_]*)%s*<?.*>?%s*")
 				table.insert(ret, default_transform(config, "class-name", text))
 			end
-			table.insert(ret, default_transform(config, "class-name", string.match(temp[#temp], "%s*([%w_]*)%s*<?.*>?%s*")))
+			table.insert(
+				ret,
+				default_transform(config, "class-name", string.match(temp[#temp], "%s*([%w_]*)%s*<?.*>?%s*"))
+			)
 			return ret
 		else
 			return default_transform(config, capture_name, capture_text)
@@ -167,13 +177,13 @@ local transform_lang = {
 			local text = string.match(capture_text, "<(.*)>")
 			local tag_name, attributes = string.match(text, "([%w-]+)(.*)")
 			local ret = tag_name
-			local id_name = string.match(attributes, "id%s*=%s*%\"([^%s]+)%\"")
+			local id_name = string.match(attributes, 'id%s*=%s*%"([^%s]+)%"')
 			if id_name ~= nil then
-				ret = ret..'#'..id_name
+				ret = ret .. "#" .. id_name
 			else
-				local class_name = string.match(attributes, "class%s*=%s*%\"([%w-_%s]+)%\"")
+				local class_name = string.match(attributes, 'class%s*=%s*%"([%w-_%s]+)%"')
 				if class_name ~= nil then
-					ret = ret..'.'..string.match(class_name, "(%w+)")
+					ret = ret .. "." .. string.match(class_name, "(%w+)")
 				end
 			end
 			return default_transform(config, "tag-name", ret)
@@ -181,7 +191,7 @@ local transform_lang = {
 	end,
 	["lua"] = function(config, capture_name, capture_text)
 		if capture_name == "string-method" then
-			return default_transform(config, "method-name", string.match(capture_text, "[\"\'](.*)[\"\']"))
+			return default_transform(config, "method-name", string.match(capture_text, "[\"'](.*)[\"']"))
 		elseif capture_name == "multi-container" then
 			local temp = vim.split(capture_text, "%.")
 			local ret = {}
@@ -192,7 +202,7 @@ local transform_lang = {
 		elseif capture_name == "table-function" then
 			local temp = vim.split(capture_text, "%.")
 			local ret = {}
-			for i = 1, #temp-1  do
+			for i = 1, #temp - 1 do
 				table.insert(ret, default_transform(config, "container-name", temp[i]))
 			end
 			table.insert(ret, default_transform(config, "function-name", temp[#temp]))
@@ -214,7 +224,7 @@ local transform_lang = {
 		else
 			return default_transform(config, capture_name, capture_text)
 		end
-	end
+	end,
 }
 
 -- If a language doesn't have a transformation
@@ -222,7 +232,7 @@ local transform_lang = {
 setmetatable(transform_lang, {
 	__index = function()
 		return default_transform
-	end
+	end,
 })
 
 -- Checks the availability of the plugin for the current buffer
@@ -256,6 +266,7 @@ function M.setup(user_config)
 	setup_language_configs()
 	default_config.depth = user_config.depth or default_config.depth
 	default_config.depth_limit_indicator = user_config.depth_limit_indicator or default_config.depth_limit_indicator
+	default_config.text_hl = user_config.text_hl or default_config.text_hl
 
 	-- Override languages specific configurations with user definitions
 	for lang, values in pairs(user_config.languages or {}) do
@@ -270,13 +281,13 @@ function M.setup(user_config)
 	setmetatable(configs, {
 		__index = function()
 			return default_config
-		end
+		end,
 	})
 
 	require("nvim-treesitter.configs").setup({
 		nvimGPS = {
-			enable = true
-		}
+			enable = true,
+		},
 	})
 
 	setup_complete = true
@@ -293,7 +304,7 @@ end)
 ---@return table|nil  the data in table format, or nil if gps is not available
 function M.get_data()
 	-- Inserting text cause error nodes
-	if vim.api.nvim_get_mode().mode == 'i' then
+	if vim.api.nvim_get_mode().mode == "i" then
 		return data_cache_value
 	end
 
@@ -330,17 +341,13 @@ function M.get_data()
 			if text == nil then
 				return data_cache_value
 			end
-			text = string.gsub(text, "%s+", ' ')
+			text = string.gsub(text, "%s+", " ")
 		else
 			text = utils.get_node_text()
-			text = table.concat(text, ' ')
+			text = table.concat(text, " ")
 		end
 
-		local node_text = transform(
-			config,
-			capture_name,
-			text
-		)
+		local node_text = transform(config, capture_name, text)
 
 		if node_text ~= nil then
 			table.insert(node_data, pos, node_text)
@@ -353,15 +360,12 @@ function M.get_data()
 
 		if capture_node == node then
 			if gps_query.captures[capture_ID] == "scope-root" then
-
 				while capture_node == node do
 					capture_ID, capture_node = iter()
 				end
 				local capture_name = gps_query.captures[capture_ID]
 				add_node_data(1, capture_name, capture_node)
-
 			elseif gps_query.captures[capture_ID] == "scope-root-2" then
-
 				capture_ID, capture_node = iter()
 				local capture_name = gps_query.captures[capture_ID]
 				add_node_data(1, capture_name, capture_node)
@@ -369,7 +373,6 @@ function M.get_data()
 				capture_ID, capture_node = iter()
 				capture_name = gps_query.captures[capture_ID]
 				add_node_data(2, capture_name, capture_node)
-
 			end
 		end
 
@@ -391,7 +394,7 @@ end
 
 ---@return string|nil  the pretty statusline component, or nil if not available
 function M.get_location(opts)
-	if vim.api.nvim_get_mode().mode == 'i' then
+	if vim.api.nvim_get_mode().mode == "i" then
 		return location_cache_value
 	end
 
@@ -425,14 +428,14 @@ function M.get_location(opts)
 	local context = {}
 	for _, v in pairs(data) do
 		if not disable_icons then
-			table.insert(context, v.icon..v.text)
+			table.insert(context, v.icon .. v.text)
 		else
 			table.insert(context, v.text)
 		end
 	end
 
 	if depth ~= 0 and #context > depth then
-		context = vim.list_slice(context, #context-depth+1, #context)
+		context = vim.list_slice(context, #context - depth + 1, #context)
 		table.insert(context, 1, depth_limit_indicator)
 	end
 
