@@ -131,13 +131,14 @@ local data_prev_loc = { 0, 0 }
 local location_prev_loc = { 0, 0 }
 local setup_complete = false
 
+local function wrap_highlight(config, text)
+	return "%#" .. config.text_hl .. "#" .. text .. "%*"
+end
+
 local function default_transform(config, capture_name, capture_text)
-	local hl = function(txt)
-		return "%#" .. config.text_hl .. "#" .. txt .. "%*"
-	end
 	return {
-		text = hl(capture_text),
-		type = hl(capture_name),
+		text = wrap_highlight(config, capture_text),
+		type = wrap_highlight(config, capture_name),
 		icon = config.icons[capture_name],
 	}
 end
@@ -414,7 +415,7 @@ function M.get_location(opts)
 	end
 
 	local depth = config.depth
-	local separator = config.separator
+	local separator = wrap_highlight(config, config.separator)
 	local disable_icons = config.disable_icons
 	local depth_limit_indicator = config.depth_limit_indicator
 
