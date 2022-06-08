@@ -415,7 +415,7 @@ function M.get_location(opts)
 	end
 
 	local depth = config.depth
-	local separator = wrap_highlight(config, config.separator)
+	local separator = config.separator
 	local disable_icons = config.disable_icons
 	local depth_limit_indicator = config.depth_limit_indicator
 
@@ -425,6 +425,7 @@ function M.get_location(opts)
 		disable_icons = opts.disable_icons or config.disable_icons
 		depth_limit_indicator = opts.depth_limit_indicator or config.depth_limit_indicator
 	end
+	separator = wrap_highlight(config, separator)
 
 	local context = {}
 	for _, v in pairs(data) do
